@@ -65,20 +65,15 @@ public class AIService {
     public record SongResult(String title, String author, String genre, String link, String reasoning) {
     }
 
-    /// Sends the prompt to ChatGPT and returns song results.
-    ///
-    /// @param model the model to use
-    /// @param input the user input
     public List<SongResult> searchSongs(String model, String input) throws IOException, InterruptedException {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("API key not set");
+            throw new IllegalStateException(Messages.get("error.apiKeyMissing"));
         }
         if (input == null || input.isBlank()) {
-            throw new IllegalArgumentException("Search query is empty");
+            throw new IllegalArgumentException(Messages.get("error.queryEmpty"));
         }
 
         ObjectNode request = mapper.createObjectNode();
-
         request.put("model", model);
         request.put("instructions", getInstructions());
         request.put("input", """
@@ -101,7 +96,8 @@ public class AIService {
 
         HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if (httpResponse.statusCode() < 200 || httpResponse.statusCode() >= 300) {
-            throw new IOException("OpenAI request failed (%d): %s".formatted(
+            throw new IOException(Messages.format(
+                    "error.requestFailed",
                     httpResponse.statusCode(),
                     extractErrorMessage(httpResponse.body())
             ));
@@ -110,22 +106,22 @@ public class AIService {
         JsonNode root = mapper.readTree(httpResponse.body());
         JsonNode refusal = root.path("refusal");
         if (!refusal.isMissingNode() && !refusal.isNull() && !refusal.asText("").isBlank()) {
-            throw new IOException("The model refused the request: " + refusal.asText());
+            throw new IOException(Messages.format("error.refused", refusal.asText()));
         }
 
         String output = extractOutputText(root);
         if (output == null || output.isBlank()) {
-            throw new IOException("The model returned an empty response.");
+            throw new IOException(Messages.get("error.emptyResponse"));
         }
 
         JsonNode jsonObject = mapper.readTree(output);
         if (!jsonObject.isObject()) {
-            throw new IOException("The model did not return a JSON object.");
+            throw new IOException(Messages.get("error.invalidJson"));
         }
 
         JsonNode songsNode = jsonObject.path("songs");
         if (!songsNode.isArray()) {
-            throw new IOException("The response does not contain a songs array.");
+            throw new IOException(Messages.get("error.songsMissing"));
         }
 
         List<SongResult> results = new ArrayList<>();
@@ -137,13 +133,12 @@ public class AIService {
         }
 
         if (results.isEmpty()) {
-            throw new IOException("No songs were returned.");
+            throw new IOException(Messages.get("error.noSongs"));
         }
 
         return results;
     }
 
-    /// Backward-compatible wrapper.
     public List<String> sendPrompt(String model, String input) throws IOException, InterruptedException {
         List<String> output = new LinkedList<>();
         for (SongResult result : searchSongs(model, input)) {

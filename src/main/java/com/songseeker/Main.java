@@ -2,6 +2,7 @@ package com.songseeker;
 
 import java.util.List;
 
+import atlantafx.base.theme.Dracula;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -14,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
@@ -22,7 +24,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -30,7 +31,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
 
 public class Main extends Application {
     private final AIService aiService = new AIService();
@@ -44,25 +44,21 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         PasswordField apiKeyField = new PasswordField();
-        apiKeyField.setPromptText("OpenAI API key");
+        apiKeyField.setPromptText(Messages.get("field.apiKey.prompt"));
         String envApiKey = System.getenv("OPENAI_API_KEY");
         if (envApiKey != null && !envApiKey.isBlank()) {
             apiKeyField.setText(envApiKey);
         }
 
         TextField modelField = new TextField(AIService.DEFAULT_MODEL);
-        modelField.setPromptText("Model");
+        modelField.setPromptText(Messages.get("field.model.prompt"));
 
         TextArea queryArea = new TextArea();
-        queryArea.setPromptText("""
-                Describe the song you are looking for, or the kind of song you want.
-                Example: a melancholic 2000s rock song with a female singer
-                Example: keresek egy nyugodt magyar dalt esti utazashoz
-                """);
+        queryArea.setPromptText(Messages.get("field.query.prompt"));
         queryArea.setWrapText(true);
         queryArea.setPrefRowCount(6);
 
-        Button searchButton = new Button("Search Songs");
+        Button searchButton = new Button(Messages.get("button.search"));
         searchButton.setDefaultButton(true);
 
         ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -70,18 +66,17 @@ public class Main extends Application {
         progressIndicator.setManaged(false);
         progressIndicator.setPrefSize(28, 28);
 
-        Label statusLabel = new Label("Enter a query to search for songs.");
+        Label statusLabel = new Label(Messages.get("status.idle"));
         statusLabel.setWrapText(true);
 
         TableView<AIService.SongResult> resultTable = createResultTable();
         resultTable.setItems(results);
-        resultTable.setPlaceholder(new Label("No results yet."));
+        resultTable.setPlaceholder(new Label(Messages.get("table.placeholder")));
 
         searchButton.setOnAction(event -> runSearch(
                 apiKeyField.getText(),
                 modelField.getText(),
                 queryArea.getText(),
-                searchButton,
                 progressIndicator,
                 statusLabel
         ));
@@ -93,15 +88,15 @@ public class Main extends Application {
                 queryArea.textProperty()
         ));
 
-        Label heading = new Label("Song Seeker");
+        Label heading = new Label(Messages.get("app.heading"));
         heading.setFont(Font.font("System", FontWeight.BOLD, 24));
 
-        Label subheading = new Label("Search by memory, mood, lyrics, era, or any custom description.");
+        Label subheading = new Label(Messages.get("app.subheading"));
         subheading.setWrapText(true);
 
         HBox credentialsRow = new HBox(12,
-                labelledBox("API Key", apiKeyField),
-                labelledBox("Model", modelField)
+                labelledBox(Messages.get("field.apiKey"), apiKeyField),
+                labelledBox(Messages.get("field.model"), modelField)
         );
         HBox.setHgrow(credentialsRow.getChildren().get(0), Priority.ALWAYS);
         HBox.setHgrow(credentialsRow.getChildren().get(1), Priority.ALWAYS);
@@ -113,7 +108,7 @@ public class Main extends Application {
                 heading,
                 subheading,
                 credentialsRow,
-                labelledBox("What song are you looking for?", queryArea),
+                labelledBox(Messages.get("field.query"), queryArea),
                 actionRow,
                 statusLabel
         );
@@ -125,7 +120,7 @@ public class Main extends Application {
         BorderPane.setMargin(resultTable, new Insets(0, 18, 18, 18));
 
         Scene scene = new Scene(root, 980, 700);
-        primaryStage.setTitle("Song Seeker");
+        primaryStage.setTitle(Messages.get("app.title"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -133,23 +128,23 @@ public class Main extends Application {
     private TableView<AIService.SongResult> createResultTable() {
         TableView<AIService.SongResult> table = new TableView<>();
 
-        TableColumn<AIService.SongResult, String> titleColumn = new TableColumn<>("Title");
+        TableColumn<AIService.SongResult, String> titleColumn = new TableColumn<>(Messages.get("table.title"));
         titleColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().title()));
         titleColumn.setPrefWidth(220);
 
-        TableColumn<AIService.SongResult, String> authorColumn = new TableColumn<>("Author");
+        TableColumn<AIService.SongResult, String> authorColumn = new TableColumn<>(Messages.get("table.author"));
         authorColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().author()));
         authorColumn.setPrefWidth(190);
 
-        TableColumn<AIService.SongResult, String> genreColumn = new TableColumn<>("Genre");
+        TableColumn<AIService.SongResult, String> genreColumn = new TableColumn<>(Messages.get("table.genre"));
         genreColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().genre()));
         genreColumn.setPrefWidth(140);
 
-        TableColumn<AIService.SongResult, String> reasonColumn = new TableColumn<>("Why It Matches");
+        TableColumn<AIService.SongResult, String> reasonColumn = new TableColumn<>(Messages.get("table.reason"));
         reasonColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().reasoning()));
         reasonColumn.setPrefWidth(320);
 
-        TableColumn<AIService.SongResult, String> linkColumn = new TableColumn<>("Link");
+        TableColumn<AIService.SongResult, String> linkColumn = new TableColumn<>(Messages.get("table.link"));
         linkColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().link()));
         linkColumn.setPrefWidth(180);
         linkColumn.setCellFactory(column -> new TableCell<>() {
@@ -188,7 +183,6 @@ public class Main extends Application {
             String apiKey,
             String model,
             String query,
-            Button searchButton,
             ProgressIndicator progressIndicator,
             Label statusLabel
     ) {
@@ -207,18 +201,18 @@ public class Main extends Application {
         searchInProgress.set(true);
         progressIndicator.setVisible(true);
         progressIndicator.setManaged(true);
-        statusLabel.setText("Searching for songs...");
+        statusLabel.setText(Messages.get("status.searching"));
 
         searchTask.setOnSucceeded(event -> {
             results.setAll(searchTask.getValue());
-            statusLabel.setText("Found %d song suggestion(s).".formatted(results.size()));
+            statusLabel.setText(Messages.format("status.searchSuccess", results.size()));
             restoreSearchButtonState(progressIndicator);
         });
 
         searchTask.setOnFailed(event -> {
             results.clear();
             Throwable error = searchTask.getException();
-            statusLabel.setText(error == null ? "Search failed." : error.getMessage());
+            statusLabel.setText(error == null ? Messages.get("status.searchFailed") : error.getMessage());
             restoreSearchButtonState(progressIndicator);
         });
 
