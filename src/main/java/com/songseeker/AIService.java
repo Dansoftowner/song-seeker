@@ -55,7 +55,7 @@ public class AIService {
                   ]
                 }
                 Rules:
-                - Return between 1 and 8 songs.
+                - Return between 1 and 15 songs.
                 - Prefer official or well-known links when possible.
                 - Every song must contain non-empty title, author, genre, and link fields.
                 - Keep reasoning short.
