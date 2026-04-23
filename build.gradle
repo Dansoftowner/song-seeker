@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.javamodularity.moduleplugin' version '2.0.0'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.argdemo'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainModule = 'com.songseeker'
+    mainClass = 'com.songseeker.Main'
+    applicationDefaultJvmArgs = []
+}
+
+javafx {
+    version = '26'
+    modules = [
+            'javafx.controls',
+            'javafx.fxml',
+    ]
+}
+
+dependencies {
+    implementation('io.github.mkpaz:atlantafx-base:2.1.0') { exclude group: "org.openjfx" }
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.17.1')
+
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
