@@ -136,14 +136,6 @@ public class AIService {
         return results;
     }
 
-    public List<String> sendPrompt(String model, String input) throws IOException, InterruptedException {
-        List<String> output = new LinkedList<>();
-        for (SongResult result : searchSongs(model, input)) {
-            output.add("%s - %s".formatted(result.title(), result.author()));
-        }
-        return output;
-    }
-
     public void setApiKey(String apiKey) {
         this.apiKey = Objects.requireNonNullElse(apiKey, "").trim();
         supported.set(!this.apiKey.isBlank());
