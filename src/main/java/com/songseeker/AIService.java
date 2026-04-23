@@ -62,9 +62,6 @@ public class AIService {
                 """;
     }
 
-    public record SongResult(String title, String author, String genre, String link, String reasoning) {
-    }
-
     public List<SongResult> searchSongs(String model, String input) throws IOException, InterruptedException {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException(Messages.get("error.apiKeyMissing"));

@@ -34,7 +34,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     private final AIService aiService = new AIService();
-    private final ObservableList<AIService.SongResult> results = FXCollections.observableArrayList();
+    private final ObservableList<SongResult> results = FXCollections.observableArrayList();
     private final BooleanProperty searchInProgress = new SimpleBooleanProperty(false);
 
     public static void main(String[] args) {
@@ -71,7 +71,7 @@ public class Main extends Application {
         Label statusLabel = new Label(Messages.get("status.idle"));
         statusLabel.setWrapText(true);
 
-        TableView<AIService.SongResult> resultTable = createResultTable();
+        TableView<SongResult> resultTable = createResultTable();
         resultTable.setItems(results);
         resultTable.setPlaceholder(new Label(Messages.get("table.placeholder")));
 
@@ -127,26 +127,26 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    private TableView<AIService.SongResult> createResultTable() {
-        TableView<AIService.SongResult> table = new TableView<>();
+    private TableView<SongResult> createResultTable() {
+        TableView<SongResult> table = new TableView<>();
 
-        TableColumn<AIService.SongResult, String> titleColumn = new TableColumn<>(Messages.get("table.title"));
+        TableColumn<SongResult, String> titleColumn = new TableColumn<>(Messages.get("table.title"));
         titleColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().title()));
         titleColumn.setPrefWidth(220);
 
-        TableColumn<AIService.SongResult, String> authorColumn = new TableColumn<>(Messages.get("table.author"));
+        TableColumn<SongResult, String> authorColumn = new TableColumn<>(Messages.get("table.author"));
         authorColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().author()));
         authorColumn.setPrefWidth(190);
 
-        TableColumn<AIService.SongResult, String> genreColumn = new TableColumn<>(Messages.get("table.genre"));
+        TableColumn<SongResult, String> genreColumn = new TableColumn<>(Messages.get("table.genre"));
         genreColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().genre()));
         genreColumn.setPrefWidth(140);
 
-        TableColumn<AIService.SongResult, String> reasonColumn = new TableColumn<>(Messages.get("table.reason"));
+        TableColumn<SongResult, String> reasonColumn = new TableColumn<>(Messages.get("table.reason"));
         reasonColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().reasoning()));
         reasonColumn.setPrefWidth(320);
 
-        TableColumn<AIService.SongResult, String> linkColumn = new TableColumn<>(Messages.get("table.link"));
+        TableColumn<SongResult, String> linkColumn = new TableColumn<>(Messages.get("table.link"));
         linkColumn.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().link()));
         linkColumn.setPrefWidth(180);
         linkColumn.setCellFactory(column -> new TableCell<>() {
@@ -190,9 +190,9 @@ public class Main extends Application {
     ) {
         aiService.setApiKey(apiKey);
 
-        Task<List<AIService.SongResult>> searchTask = new Task<>() {
+        Task<List<SongResult>> searchTask = new Task<>() {
             @Override
-            protected List<AIService.SongResult> call() throws Exception {
+            protected List<SongResult> call() throws Exception {
                 return aiService.searchSongs(
                         model == null || model.isBlank() ? AIService.DEFAULT_MODEL : model.trim(),
                         query
