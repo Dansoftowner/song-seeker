@@ -43,6 +43,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
+
         PasswordField apiKeyField = new PasswordField();
         apiKeyField.setPromptText(Messages.get("field.apiKey.prompt"));
         String envApiKey = System.getenv("OPENAI_API_KEY");
