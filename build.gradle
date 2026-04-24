@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'org.javamodularity.moduleplugin' version '2.0.0'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.beryx.jlink' version '3.2.0'
 }
 
 group = 'com.argdemo'
@@ -33,6 +34,18 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:6.0.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+jlink {
+    options = ['--strip-debug', '--compress=zip-0', '--no-header-files', '--no-man-pages']
+
+    jpackage {
+        jpackageHome = System.getProperty("java.home")
+        skipInstaller = true
+        imageName = 'SongSeeker'
+        vendor = 'SongSeeker'
+        appVersion = '1.0.0'
+    }
 }
 
 test {
